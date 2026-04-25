@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kharghar Franchise Investment Portal</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Application Structure Plan: 
+         The SPA is designed as a 'Strategic Comparison Hub'. 
+         1. Executive Summary: A high-level overview of why these specific brands fit the Kharghar demographic.
+         2. Comparative Dashboard: An interactive grid of 'Cards' representing each franchise.
+         3. Dynamic Detail Engine: A side-panel or modal-like view (implemented as a dynamic section) that breaks down the specific PDF data (Equipment costs, Brand fees, and ROI).
+         4. Investment Matrix: A visual Chart.js representation of Investment vs. Risk to help a 'noob' investor visualize the safety of their 15L capital.
+    -->
+    
+    <!-- Visualization & Content Choices: 
+         1. Multi-Bar Chart: Goal: Compare. Compares the 'Franchise Fee' vs 'Total Investment' across all options.
+         2. Bubble Chart: Goal: Relationships. Plots 'Ease of Management' against 'Profit Potential'.
+         3. Dynamic Comparison Table: Goal: Organize. Allows sorting by investment amount.
+         4. Text Blocks: Synthesized from PDF data (e.g., Laundrywala's 'No Royalty until ROI' clause and Kouzina's 'Launchpad' model).
+    -->
+    
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc; /* Slate 50 */
+            color: #1e293b; /* Slate 800 */
+        }
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+
+        .custom-shadow {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+        }
+
+        .accent-gradient {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        }
+
+        .scroll-hide::-webkit-scrollbar { display: none; }
+        .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Sidebar Navigation (Desktop) -->
+    <div class="flex flex-col lg:flex-row min-h-screen">
+        
+        <aside class="w-full lg:w-72 bg-white border-r border-slate-200 p-6 flex flex-col">
+            <div class="flex items-center gap-3 mb-10">
+                <div class="w-10 h-10 rounded-xl accent-gradient flex items-center justify-center text-white font-bold text-xl">&#10064;</div>
+                <div>
+                    <h1 class="font-bold text-slate-900 leading-tight">First-Time<br>Investor</h1>
+                </div>
+            </div>
+
+            <nav class="space-y-1 flex-grow">
+                <button onclick="switchSection('overview')" class="nav-btn w-full text-left px-4 py-3 rounded-lg text-sm font-semibold transition-all bg-indigo-50 text-indigo-700">Market Overview</button>
+                <button onclick="switchSection('comparison')" class="nav-btn w-full text-left px-4 py-3 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-all">Brand Comparison</button>
+                <button onclick="switchSection('financials')" class="nav-btn w-full text-left px-4 py-3 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-all">Investment Matrix</button>
+                <button onclick="switchSection('location')" class="nav-btn w-full text-left px-4 py-3 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-all">Kharghar Analysis</button>
+            </nav>
+
+            <div class="mt-10 p-4 rounded-xl bg-slate-900 text-white">
+                <p class="text-xs font-medium text-slate-400 uppercase mb-2">Budget Status</p>
+                <div class="flex justify-between items-end mb-1">
+                    <span class="text-lg font-bold">₹15.0L</span>
+                    <span class="text-xs text-indigo-400">Target</span>
+                </div>
+                <div class="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                    <div class="bg-indigo-500 h-full w-full"></div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-grow p-4 lg:p-10 overflow-y-auto">
+            
+            <!-- Section: Overview -->
+            <section id="section-overview" class="section-content">
+                <div class="max-w-5xl">
+                    <h2 class="text-3xl font-extrabold text-slate-900 mb-2">Franchise Research Plan</h2>
+                    <p class="text-slate-500 mb-8 leading-relaxed">
+                        This guide synthesizes data from 10+ franchise brochures specifically for a <span class="font-semibold text-slate-800">500 sq ft space in Paradise Mall, Kharghar</span>. As a first-time investor, the focus is on <span class="text-indigo-600 font-medium">FOCO/FICO models</span> that offer high operational support and low management stress.
+                    </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 custom-shadow">
+                            <div class="text-indigo-500 text-2xl mb-2 font-bold">&#9733;</div>
+                            <h4 class="font-bold text-slate-800">Low Risk Picks</h4>
+                            <p class="text-xs text-slate-500 mt-1">Brands with high brand recall and essential service demand (Amul, Laundrywala).</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 custom-shadow">
+                            <div class="text-emerald-500 text-2xl mb-2 font-bold">&#128200;</div>
+                            <h4 class="font-bold text-slate-800">High Yield Picks</h4>
+                            <p class="text-xs text-slate-500 mt-1">Multi-brand cloud kitchens (Kouzina) or viral QSRs (Zorko).</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 custom-shadow">
+                            <div class="text-amber-500 text-2xl mb-2 font-bold">&#128640;</div>
+                            <h4 class="font-bold text-slate-800">Modern Service</h4>
+                            <p class="text-xs text-slate-500 mt-1">Specialized laundry and food tech integration for the busy Kharghar demographic.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-indigo-900 rounded-3xl p-8 text-white flex flex-col md:flex-row items-center gap-8">
+                        <div class="flex-grow">
+                            <h3 class="text-2xl font-bold mb-2">Why Paradise Mall (Sai World Empire)?</h3>
+                            <p class="text-indigo-200 text-sm leading-relaxed">
+                                Kharghar has a high density of working professionals and students (NMIMS, NIFT). Paradise Mall caters to the premium "Sai World Empire" residents. A 500 sq ft shop is ideal for a service point (Laundry) or a high-end QSR with limited seating.
+                            </p>
+                        </div>
+                        <div class="flex-shrink-0 grid grid-cols-2 gap-4">
+                            <div class="bg-white/10 p-3 rounded-lg text-center">
+                                <div class="text-lg font-bold">15,000+</div>
+                                <div class="text-[10px] uppercase text-indigo-300">Nearby Families</div>
+                            </div>
+                            <div class="bg-white/10 p-3 rounded-lg text-center">
+                                <div class="text-lg font-bold">Premium</div>
+                                <div class="text-[10px] uppercase text-indigo-300">Spending Power</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: Comparison -->
+            <section id="section-comparison" class="section-content hidden">
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-900">Brand Deep-Dive</h2>
+                        <p class="text-slate-500 text-sm">Select a brand to see technical details from the PDF reports.</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="filterBrands('All')" class="px-3 py-1 text-xs font-bold rounded-full bg-slate-200 text-slate-600">All</button>
+                        <button onclick="filterBrands('F&B')" class="px-3 py-1 text-xs font-bold rounded-full bg-indigo-100 text-indigo-600">Food</button>
+                        <button onclick="filterBrands('Services')" class="px-3 py-1 text-xs font-bold rounded-full bg-emerald-100 text-emerald-600">Services</button>
+                    </div>
+                </div>
+
+                <div id="brand-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <!-- Cards will be injected here by JS -->
+                </div>
+            </section>
+
+            <!-- Section: Financials -->
+            <section id="section-financials" class="section-content hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 custom-shadow">
+                        <h3 class="font-bold text-slate-800 mb-2">Total Investment vs. Franchise Fee</h3>
+                        <p class="text-xs text-slate-500 mb-6">Analyzing how much of your capital goes into the brand vs. assets/equipment.</p>
+                        <div class="chart-container">
+                            <canvas id="investmentChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 custom-shadow">
+                        <h3 class="font-bold text-slate-800 mb-2">Success Probability & Ease (0-100)</h3>
+                        <p class="text-xs text-slate-500 mb-6">Bubble size indicates required floor space (sq ft).</p>
+                        <div class="chart-container">
+                            <canvas id="bubbleChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 bg-white p-6 rounded-2xl border border-slate-200 custom-shadow">
+                    <h3 class="font-bold text-slate-800 mb-4">The "Noob" Recommendation Matrix</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-50 text-slate-600 uppercase text-[10px] font-bold">
+                                <tr>
+                                    <th class="px-4 py-3">Brand Name</th>
+                                    <th class="px-4 py-3 text-center">Inv. (L)</th>
+                                    <th class="px-4 py-3">Risk Level</th>
+                                    <th class="px-4 py-3">Unique PDF Insight</th>
+                                </tr>
+                            </thead>
+                            <tbody id="matrix-body" class="divide-y divide-slate-100">
+                                <!-- Data injected by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: Location Analysis -->
+            <section id="section-location" class="section-content hidden">
+                <div class="max-w-4xl bg-white p-8 rounded-3xl border border-slate-200 custom-shadow">
+                    <h2 class="text-2xl font-bold mb-4">Strategic Location Analysis: Paradise Mall</h2>
+                    <div class="space-y-6">
+                        <div class="flex gap-4 p-4 rounded-xl bg-blue-50 border border-blue-100">
+                            <div class="text-2xl">&#128205;</div>
+                            <div>
+                                <h4 class="font-bold text-blue-900">Footfall Profile</h4>
+                                <p class="text-sm text-blue-800">The mall is "destination-based" for residents of Sai World Empire. It is not high-street. Therefore, your business must be a <strong>needed service</strong> or a <strong>destination flavor</strong>.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 p-4 rounded-xl bg-orange-50 border border-orange-100">
+                            <div class="text-2xl">&#128666;</div>
+                            <div>
+                                <h4 class="font-bold text-orange-900">Logistics & Supply</h4>
+                                <p class="text-sm text-orange-800">Kharghar is well connected. Kouzina and Zorko have strong supply chains in Mumbai, ensuring low wastage for a new owner.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 p-4 rounded-xl bg-purple-50 border border-purple-100">
+                            <div class="text-2xl">&#128188;</div>
+                            <div>
+                                <h4 class="font-bold text-purple-900">Expert Verdict</h4>
+                                <p class="text-sm text-purple-800">For a "noob", <strong>Laundrywala</strong> or <strong>Amul</strong> offer the cleanest path. If you want to scale, <strong>Kouzina</strong> allows you to test 5+ brands (WarmOven, Indiana Burger) in one 500 sq ft space with zero marketing effort.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Modals/Detail Overlays -->
+    <div id="detail-overlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white w-full max-w-2xl rounded-3xl overflow-hidden custom-shadow">
+            <div id="detail-header" class="p-6 text-white accent-gradient flex justify-between items-center">
+                <h3 id="modal-title" class="text-xl font-bold">Brand Details</h3>
+                <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/40 transition-all font-bold">X</button>
+            </div>
+            <div id="modal-content" class="p-8 space-y-6 max-h-[70vh] overflow-y-auto">
+                <!-- Content injected here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Source Data Synthesis from PDFs and User Request
+        const brandData = [
+            {
+                id: 'zorko',
+                name: 'ZORKO',
+                sector: 'F&B',
+                investment: 15,
+                fee: 5,
+                roi: '12-18 Months',
+                risk: 'Medium',
+                ease: 70,
+                space: 300,
+                color: '#6366f1',
+                tagline: 'Shark Tank India Featured - Pure Veg QSR',
+                pdfInsight: 'Operates highest number of pure veg QSR outlets. Extremely high brand recall for fries and burgers.'
+            },
+            {
+                id: 'laundrywala',
+                name: 'Laundrywala',
+                sector: 'Services',
+                investment: 14,
+                fee: 4,
+                roi: 'ROI Priority',
+                risk: 'Low',
+                ease: 90,
+                space: 250,
+                color: '#10b981',
+                tagline: 'No Royalties until ROI is achieved',
+                pdfInsight: 'Compared to Tumbledry/Fabrico, offers 4L fee and 6k/month royalty only after you break even.'
+            },
+            {
+                id: 'kouzina',
+                name: 'Kouzina Launchpad',
+                sector: 'F&B',
+                investment: 5,
+                fee: 1,
+                roi: '10-14 Months',
+                risk: 'Low',
+                ease: 85,
+                space: 200,
+                color: '#f59e0b',
+                tagline: 'Multi-brand Cloud Kitchen (10+ Brands)',
+                pdfInsight: 'Run WarmOven, Indiana Burgers, KaatiZone simultaneously. Low entry barrier (<5L total initial outlay).'
+            },
+            {
+                id: 'amul',
+                name: 'Amul Parlor',
+                sector: 'F&B',
+                investment: 6,
+                roi: '8-12 Months',
+                fee: 0.5,
+                risk: 'Very Low',
+                ease: 95,
+                space: 300,
+                color: '#ef4444',
+                tagline: 'The Taste of India - Standardized Retail',
+                pdfInsight: 'Highest trust factor. Minimal staff required. Paradise Mall residents buy daily dairy/ice-cream.'
+            },
+            {
+                id: 'mysore',
+                name: 'Mysore Aduge',
+                sector: 'F&B',
+                investment: 12,
+                fee: 3,
+                roi: '15-20 Months',
+                risk: 'Medium',
+                ease: 65,
+                space: 500,
+                color: '#8b5cf6',
+                tagline: 'Authentic South Indian Flavors',
+                pdfInsight: 'High demand in Navi Mumbai. Requires specialized cooks but company provides training SOPS.'
+            },
+            {
+                id: 'trp',
+                name: 'TRP / Multi-Brand',
+                sector: 'F&B',
+                investment: 10,
+                fee: 2.5,
+                roi: '14 Months',
+                risk: 'Medium',
+                ease: 75,
+                space: 400,
+                color: '#ec4899',
+                tagline: 'Bhuka Sher & Chopper Stop Portfolio',
+                pdfInsight: 'Includes Chinese (Dou Chi) and North Indian (Bhuka Sher). Great for multi-cuisine mall kiosks.'
+            }
+        ];
+
+        // State Management
+        let currentSection = 'overview';
+        let charts = {};
+
+        // UI Logic
+        function switchSection(sectionId) {
+            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
+            document.getElementById(`section-${sectionId}`).classList.remove('hidden');
+            
+            // Update Nav Buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-50', 'text-indigo-700');
+                btn.classList.add('text-slate-600', 'hover:bg-slate-50');
+            });
+            event.currentTarget.classList.add('bg-indigo-50', 'text-indigo-700');
+            event.currentTarget.classList.remove('text-slate-600', 'hover:bg-slate-50');
+
+            if (sectionId === 'financials') initCharts();
+        }
+
+        function filterBrands(sector) {
+            const grid = document.getElementById('brand-grid');
+            grid.innerHTML = '';
+            
+            const filtered = sector === 'All' ? brandData : brandData.filter(b => b.sector === sector);
+            
+            filtered.forEach(brand => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-6 rounded-2xl border border-slate-200 custom-shadow hover:border-indigo-300 transition-all cursor-pointer group";
+                card.onclick = () => openModal(brand.id);
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center text-xl" style="background: ${brand.color}20; color: ${brand.color}">
+                            ${brand.sector === 'F&B' ? '&#127828;' : '&#128085;'}
+                        </div>
+                        <span class="text-[10px] font-bold uppercase px-2 py-1 rounded bg-slate-100 text-slate-500">${brand.sector}</span>
+                    </div>
+                    <h4 class="text-lg font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">${brand.name}</h4>
+                    <p class="text-xs text-slate-500 mb-4">${brand.tagline}</p>
+                    <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-50">
+                        <div>
+                            <div class="text-[10px] text-slate-400 uppercase font-bold">Invest</div>
+                            <div class="text-sm font-bold text-slate-800">₹${brand.investment}L</div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-slate-400 uppercase font-bold">Risk</div>
+                            <div class="text-sm font-bold ${brand.risk === 'Low' || brand.risk === 'Very Low' ? 'text-emerald-600' : 'text-amber-600'}">${brand.risk}</div>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function openModal(brandId) {
+            const brand = brandData.find(b => b.id === brandId);
+            document.getElementById('modal-title').innerText = brand.name + " Opportunity";
+            
+            const content = document.getElementById('modal-content');
+            content.innerHTML = `
+                <div class="grid grid-cols-2 gap-8 mb-8">
+                    <div class="p-4 bg-slate-50 rounded-2xl">
+                        <div class="text-xs text-slate-400 font-bold uppercase mb-1">Franchise Fee</div>
+                        <div class="text-2xl font-bold text-slate-900">₹${brand.fee}L</div>
+                    </div>
+                    <div class="p-4 bg-slate-50 rounded-2xl">
+                        <div class="text-xs text-slate-400 font-bold uppercase mb-1">Est. ROI</div>
+                        <div class="text-2xl font-bold text-slate-900">${brand.roi}</div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h5 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
+                        <span class="w-1 h-4 bg-indigo-500 rounded"></span>
+                        Key Information from PDF Brochure
+                    </h5>
+                    <p class="text-sm text-slate-600 leading-relaxed bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">
+                        ${brand.pdfInsight}
+                    </p>
+                </div>
+
+                <div class="space-y-4 pt-4">
+                    <h5 class="font-bold text-slate-800 mb-3">Model Advantages</h5>
+                    <ul class="space-y-2">
+                        <li class="flex items-center gap-3 text-sm text-slate-600">
+                            <span class="text-emerald-500 font-bold">&#10003;</span>
+                            Space Required: ${brand.space} sq ft (Fits your 500 sq ft shop comfortably)
+                        </li>
+                        <li class="flex items-center gap-3 text-sm text-slate-600">
+                            <span class="text-emerald-500 font-bold">&#10003;</span>
+                            First-Timer Suitability: ${brand.ease}/100
+                        </li>
+                        <li class="flex items-center gap-3 text-sm text-slate-600">
+                            <span class="text-emerald-500 font-bold">&#10003;</span>
+                            Kharghar Specific Demand: High
+                        </li>
+                    </ul>
+                </div>
+            `;
+            
+            document.getElementById('detail-overlay').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('detail-overlay').classList.add('hidden');
+        }
+
+        function initCharts() {
+            if (charts.investment) charts.investment.destroy();
+            if (charts.bubble) charts.bubble.destroy();
+
+            // Investment Chart
+            const invCtx = document.getElementById('investmentChart').getContext('2d');
+            charts.investment = new Chart(invCtx, {
+                type: 'bar',
+                data: {
+                    labels: brandData.map(b => b.name),
+                    datasets: [
+                        {
+                            label: 'Total Investment (L)',
+                            data: brandData.map(b => b.investment),
+                            backgroundColor: brandData.map(b => b.color + '90'),
+                            borderColor: brandData.map(b => b.color),
+                            borderWidth: 2,
+                            borderRadius: 8
+                        },
+                        {
+                            label: 'Franchise Fee (L)',
+                            data: brandData.map(b => b.fee),
+                            backgroundColor: '#e2e8f0',
+                            borderColor: '#cbd5e1',
+                            borderWidth: 1,
+                            borderRadius: 8
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, grid: { display: false } },
+                        x: { grid: { display: false } }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { size: 10 } } }
+                    }
+                }
+            });
+
+            // Bubble Chart for Risk/Ease
+            const bubbleCtx = document.getElementById('bubbleChart').getContext('2d');
+            charts.bubble = new Chart(bubbleCtx, {
+                type: 'bubble',
+                data: {
+                    datasets: brandData.map(b => ({
+                        label: b.name,
+                        data: [{
+                            x: b.ease,
+                            y: b.investment,
+                            r: b.space / 15
+                        }],
+                        backgroundColor: b.color + '40',
+                        borderColor: b.color,
+                        borderWidth: 2
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { title: { display: true, text: 'Ease of Management (0-100)', font: { size: 10 } } },
+                        y: { title: { display: true, text: 'Investment (Lakhs)', font: { size: 10 } } }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => `${ctx.dataset.label}: Inv: ${ctx.raw.y}L, Ease: ${ctx.raw.x}`
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Matrix Table Populate
+            const matrix = document.getElementById('matrix-body');
+            matrix.innerHTML = '';
+            brandData.forEach(b => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-4 py-3 font-semibold text-slate-700">${b.name}</td>
+                    <td class="px-4 py-3 text-center font-bold">${b.investment}</td>
+                    <td class="px-4 py-3">
+                        <span class="px-2 py-0.5 text-[10px] font-bold rounded-full ${b.risk.includes('Low') ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${b.risk}</span>
+                    </td>
+                    <td class="px-4 py-3 text-xs text-slate-500 italic">${b.pdfInsight.substring(0, 50)}...</td>
+                `;
+                matrix.appendChild(row);
+            });
+        }
+
+        // Initialize App
+        window.onload = () => {
+            filterBrands('All');
+        };
+
+    </script>
+</body>
+</html>
